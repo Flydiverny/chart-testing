@@ -49,6 +49,7 @@ type Configuration struct {
 	ProcessAllCharts      bool     `mapstructure:"all"`
 	Charts                []string `mapstructure:"charts"`
 	ChartRepos            []string `mapstructure:"chart-repos"`
+	ChartRepoCredentials  []string `mapstructure:"chart-repo-credentials"`
 	ChartDirs             []string `mapstructure:"chart-dirs"`
 	ExcludedCharts        []string `mapstructure:"excluded-charts"`
 	HelmExtraArgs         string   `mapstructure:"helm-extra-args"`

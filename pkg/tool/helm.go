@@ -40,6 +40,10 @@ func (h Helm) AddRepo(name string, url string) error {
 	return h.exec.RunProcess("helm", "repo", "add", name, url)
 }
 
+func (h Helm) AddRepoWithCredentials(name string, url string, username string, password string) error {
+	return h.exec.RunProcess("helm", "repo", "add", name, url, "--username", username, "--password", password)
+}
+
 func (h Helm) BuildDependencies(chart string) error {
 	return h.exec.RunProcess("helm", "dependency", "build", chart)
 }

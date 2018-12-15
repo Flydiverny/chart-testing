@@ -65,6 +65,7 @@ type Git interface {
 type Helm interface {
 	Init() error
 	AddRepo(name string, url string) error
+	AddRepoWithCredentials(name string, url string, username string, password string) error
 	BuildDependencies(chart string) error
 	LintWithValues(chart string, valuesFile string) error
 	InstallWithValues(chart string, valuesFile string, namespace string, release string) error
@@ -197,12 +198,33 @@ func (t *Testing) processCharts(action func(chart string, valuesFiles []string) 
 		return nil, errors.Wrap(err, "Error initializing Helm")
 	}
 
+	var repoCredentials map[string]string
+	repoCredentials = make(map[string]string)
+
+	for _, repo := range t.config.ChartRepoCredentials {
+		repoSlice := strings.SplitN(repo, "=", 2)
+		name := repoSlice[0]
+		credentials := repoSlice[1]
+		repoCredentials[name] = credentials
+	}
+
 	for _, repo := range t.config.ChartRepos {
 		repoSlice := strings.SplitN(repo, "=", 2)
 		name := repoSlice[0]
 		url := repoSlice[1]
-		if err := t.helm.AddRepo(name, url); err != nil {
-			return nil, errors.Wrapf(err, "Error adding repo: %s=%s", name, url)
+
+		if credentials, ok := repoCredentials[name]; ok {
+			repoSlice := strings.SplitN(credentials, ":", 2)
+			username := repoSlice[0]
+			password := repoSlice[1]
+
+			if err := t.helm.AddRepoWithCredentials(name, url, username, password); err != nil {
+				return nil, errors.Wrapf(err, "Error adding repo with credentials: %s=%s", name, url)
+			}
+		} else {
+			if err := t.helm.AddRepo(name, url); err != nil {
+				return nil, errors.Wrapf(err, "Error adding repo: %s=%s", name, url)
+			}
 		}
 	}
 

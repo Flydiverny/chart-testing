@@ -9,6 +9,9 @@ check-version-increment: true
 all: false
 chart-repos:
   - incubator=https://incubator
+  - private=https://private
+chart-repo-credentials:
+  - private=user:pass
 chart-dirs:
   - stable
   - incubator
